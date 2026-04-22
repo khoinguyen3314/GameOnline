@@ -231,10 +231,9 @@ GameObject:
   - component: {fileID: 7612624181737896272}
   - component: {fileID: 3274160497299756033}
   - component: {fileID: 8121619682273748804}
-  - component: {fileID: 5036993316639877800}
   - component: {fileID: 5893425072500175751}
-  - component: {fileID: -3291211987406709996}
-  - component: {fileID: 2418574379632918317}
+  - component: {fileID: 4460252471371497682}
+  - component: {fileID: 2799262378087616358}
   m_Layer: 0
   m_Name: Werewolf_Legacy
   m_TagString: Untagged
@@ -251,7 +250,7 @@ Transform:
   m_GameObject: {fileID: 677729754446470314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -387,9 +386,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8121619682273748804}
-  - {fileID: 5036993316639877800}
   - {fileID: 5893425072500175751}
-  - {fileID: -3291211987406709996}
+  - {fileID: 4460252471371497682}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8121619682273748804
 MonoBehaviour:
@@ -408,24 +406,6 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
---- !u!114 &5036993316639877800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677729754446470314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6edcfc9e9ff0c7d4184632a990e73523, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectRange: 100
-  attackRange: 2
-  damage: 10
-  attackCooldown: 1.2
-  agent: {fileID: 7612624181737896272}
-  netAnim: {fileID: 5893425072500175751}
 --- !u!114 &5893425072500175751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -444,7 +424,7 @@ MonoBehaviour:
   StateHashes: 00000000dd5d99d5506fe6fb7c63b49ffbe1a8043e6c76c726c7b83eb5e7b084a8e077c35f74dc23a6ed2665c7f997bb8f9b69fc7d0c564ca3a7172f64bac0b4450ae770ae55d1d26e6291aa2ed547e7ac9a0b6246493d84c26aeb6bfc18341d783be2f2af4e27b8fd14589101757c3ea4319b811349e00afd2b287f73b990870b0798e6880869b4950faef31cabd00bac5a6f55c0a47650b96ee5f69089e3fad327d0f9f213a5eac1a080ddc5035269077193cbbacd80a41f89671b25e36443cb81ac36557a918d0720eea41c6cee20984f38cf
   TriggerHashes: 0000000037b93501
   TotalWords: 1
---- !u!114 &-3291211987406709996
+--- !u!114 &4460252471371497682
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -453,13 +433,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 677729754446470314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 315f1ef61ddac3d4091fb2ff6f92267d, type: 3}
+  m_Script: {fileID: 11500000, guid: c9b4902b4d11222479d4457993bd3889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _CurrentHP: 10
-  MaxHP: 100
-  Run: {fileID: 5036993316639877800}
---- !u!114 &2418574379632918317
+  patrolPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  waitTime: 3
+  viewDistance: 10
+  viewAngle: 60
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1
+  chaseSpeed: 5
+  patrolSpeed: 2
+  attackRange: 2
+--- !u!114 &2799262378087616358
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -468,10 +458,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 677729754446470314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1c26ba26ea7eeb49b830edef1d12478, type: 3}
+  m_Script: {fileID: 1541381998, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthSlider: {fileID: 7042591520827353222}
+  Guid:
+    RawGuidValue: 119acf59dd2a1fc4c91221c1b5765bf9
 --- !u!1 &677729754446470316
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,14 +1,18 @@
 using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyWaveSpawner : NetworkBehaviour
 {
     [Header("Enemy")]
     [SerializeField] private NetworkPrefabRef[] enemyPrefabs;
 
-    [Header("Spawn Point")]
-    [SerializeField] private Transform spawnPoint;
+    [Header("Spawn Points")]
+    [SerializeField] private Transform[] spawnPoints;
+
+    [Header("Spawn Area")]
+    [SerializeField] private float spawnRadius = 5f;
 
     [Header("Wave Settings")]
     [SerializeField] private float spawnDelay = 1f;
@@ -19,7 +23,6 @@ public class EnemyWaveSpawner : NetworkBehaviour
 
     public override void Spawned()
     {
-        // ? ?ÚNG cho scene object
         if (!Runner.IsServer)
             return;
 
@@ -42,9 +45,9 @@ public class EnemyWaveSpawner : NetworkBehaviour
 
     IEnumerator SpawnWave()
     {
-        if (spawnPoint == null)
+        if (spawnPoints == null || spawnPoints.Length == 0)
         {
-            Debug.LogError("? SpawnPoint b? NULL!");
+            Debug.LogError("? Ch?a add Spawn Points!");
             yield break;
         }
 
@@ -63,22 +66,40 @@ public class EnemyWaveSpawner : NetworkBehaviour
 
     void SpawnEnemy()
     {
+        // ?? ch?n random spawn point
+        int pointIndex = Random.Range(0, spawnPoints.Length);
+        Transform chosenPoint = spawnPoints[pointIndex];
+
+        // ?? random quanh point ?ó
+        Vector3 randomPos = chosenPoint.position + new Vector3(
+            Random.Range(-spawnRadius, spawnRadius),
+            0,
+            Random.Range(-spawnRadius, spawnRadius)
+        );
+
+        // ?? ép xu?ng NavMesh
+        NavMeshHit hit;
+        if (!NavMesh.SamplePosition(randomPos, out hit, 10f, NavMesh.AllAreas))
+        {
+            Debug.LogWarning("? Không tìm th?y NavMesh g?n spawn ? b? qua");
+            return;
+        }
+
+        Vector3 finalPos = hit.position;
+
+        // ?? ch?n enemy
         int prefabIndex = Random.Range(0, enemyPrefabs.Length);
         NetworkPrefabRef selectedEnemy = enemyPrefabs[prefabIndex];
 
-        Vector3 spawnPos = spawnPoint.position;
-
-        Debug.Log("?? TRY SPAWN");
-
-        var obj = Runner.Spawn(selectedEnemy, spawnPos, Quaternion.identity);
+        var obj = Runner.Spawn(selectedEnemy, finalPos, Quaternion.identity);
 
         if (obj == null)
         {
-            Debug.LogError("? Spawn FAILED! ? ki?m tra NetworkProjectConfig");
+            Debug.LogError("? Spawn FAILED!");
         }
         else
         {
-            Debug.Log("? Spawn SUCCESS: " + obj.name);
+            Debug.Log($"? Spawn t?i point {pointIndex}: {obj.name}");
         }
     }
 }
