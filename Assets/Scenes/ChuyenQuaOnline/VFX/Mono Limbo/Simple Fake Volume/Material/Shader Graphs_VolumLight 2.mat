@@ -8,8 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Shader Graphs_VolumLight 2
-  m_Shader: {fileID: -6465566751694194690, guid: b76f86d9bd3a4bc4c84563b733e334b5,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: b76f86d9bd3a4bc4c84563b733e334b5, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -52,18 +51,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Ambient_Occlusion: 0
-    - _Edg: 0.56
-    - _Emission: 0.57
-    - _Metalic: -0.48
-    - _Opacity: 0.56
-    - _Power: 2.14
+    - _Ambient_Occlusion: -1.49
+    - _Edg: 0.46
+    - _Emission: -0.09
+    - _Metalic: -2.25
+    - _Opacity: 1.63
+    - _Power: 0.7
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Smoothness: 1.81
+    - _Smoothness: 0.68
     - _Texture: 1
     m_Colors:
-    - _Color: {r: 0.6841509, g: 0.79063845, b: 0.97735846, a: 0.043137256}
+    - _Color: {r: 0.27107865, g: 0.40335163, b: 0.4188679, a: 0.043137256}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &6656787299696832730

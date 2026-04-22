@@ -21,12 +21,12 @@ MonoBehaviour:
     m_Value: 26
   colorFilter:
     m_OverrideState: 1
-    m_Value: {r: 0.8867924, g: 0.8282307, b: 0.8282307, a: 1}
+    m_Value: {r: 0.8132075, g: 0.9040702, b: 1, a: 1}
   hueShift:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: -9
   saturation:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
 --- !u!114 &-7893295128165547882
 MonoBehaviour:
@@ -46,10 +46,10 @@ MonoBehaviour:
     m_Value: 0
   threshold:
     m_OverrideState: 1
-    m_Value: 1.04
+    m_Value: 7.7
   intensity:
     m_OverrideState: 1
-    m_Value: 0.4
+    m_Value: 0
   scatter:
     m_OverrideState: 1
     m_Value: 0
@@ -58,7 +58,7 @@ MonoBehaviour:
     m_Value: 65472
   tint:
     m_OverrideState: 1
-    m_Value: {r: 0.8490566, g: 0.5588048, b: 0.34442857, a: 1}
+    m_Value: {r: 0.5018867, g: 0.5018867, b: 0.5018867, a: 1}
   highQualityFiltering:
     m_OverrideState: 1
     m_Value: 1
@@ -137,13 +137,13 @@ MonoBehaviour:
   active: 1
   redOutRedIn:
     m_OverrideState: 1
-    m_Value: 100
+    m_Value: 95
   redOutGreenIn:
     m_OverrideState: 1
-    m_Value: 21
+    m_Value: 7
   redOutBlueIn:
     m_OverrideState: 1
-    m_Value: -4
+    m_Value: -0
   greenOutRedIn:
     m_OverrideState: 0
     m_Value: 0
