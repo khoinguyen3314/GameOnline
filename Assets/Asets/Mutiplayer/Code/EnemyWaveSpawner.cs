@@ -1,6 +1,7 @@
-using System.Collections;
+﻿using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyWaveSpawner : NetworkBehaviour
 {
@@ -9,6 +10,9 @@ public class EnemyWaveSpawner : NetworkBehaviour
 
     [Header("Spawn Point")]
     [SerializeField] private Transform spawnPoint;
+
+    [Header("Patrol Manager")]
+    [SerializeField] private PatrolPointManager patrolManager;
 
     [Header("Wave Settings")]
     [SerializeField] private float spawnDelay = 1f;
@@ -19,11 +23,10 @@ public class EnemyWaveSpawner : NetworkBehaviour
 
     public override void Spawned()
     {
-        // ? ?�NG cho scene object
         if (!Runner.IsServer)
             return;
 
-        Debug.Log("? Spawner started!");
+        Debug.Log("Spawner started!");
         StartCoroutine(SpawnWaveLoop());
     }
 
@@ -32,10 +35,9 @@ public class EnemyWaveSpawner : NetworkBehaviour
         while (true)
         {
             currentWave++;
-            Debug.Log("?? Wave: " + currentWave);
+            Debug.Log("Wave: " + currentWave);
 
             yield return SpawnWave();
-
             yield return new WaitForSeconds(waveDelay);
         }
     }
@@ -44,13 +46,13 @@ public class EnemyWaveSpawner : NetworkBehaviour
     {
         if (spawnPoint == null)
         {
-            Debug.LogError("? SpawnPoint b? NULL!");
+            Debug.LogError("SpawnPoint NULL!");
             yield break;
         }
 
         if (enemyPrefabs == null || enemyPrefabs.Length == 0)
         {
-            Debug.LogError("? Ch?a add Enemy Prefab!");
+            Debug.LogError("Chưa add Enemy Prefab!");
             yield break;
         }
 
@@ -66,19 +68,47 @@ public class EnemyWaveSpawner : NetworkBehaviour
         int prefabIndex = Random.Range(0, enemyPrefabs.Length);
         NetworkPrefabRef selectedEnemy = enemyPrefabs[prefabIndex];
 
-        Vector3 spawnPos = spawnPoint.position;
+        Vector3 basePos = spawnPoint.position;
 
-        Debug.Log("?? TRY SPAWN");
+        // 🔥 Random quanh spawn
+        Vector3 randomPos = basePos + Random.insideUnitSphere * 3f;
+        randomPos.y = basePos.y;
 
-        var obj = Runner.Spawn(selectedEnemy, spawnPos, Quaternion.identity);
+        // 🔥 Ép xuống NavMesh
+        NavMeshHit hit;
+        Vector3 finalPos = basePos;
 
-        if (obj == null)
+        if (NavMesh.SamplePosition(randomPos, out hit, 5f, NavMesh.AllAreas))
         {
-            Debug.LogError("? Spawn FAILED! ? ki?m tra NetworkProjectConfig");
+            finalPos = hit.position;
+        }
+        else if (NavMesh.SamplePosition(basePos, out hit, 5f, NavMesh.AllAreas))
+        {
+            finalPos = hit.position;
         }
         else
         {
-            Debug.Log("? Spawn SUCCESS: " + obj.name);
+            Debug.LogWarning("Không tìm thấy NavMesh gần spawn!");
+        }
+
+        Debug.Log("TRY SPAWN");
+
+        var obj = Runner.Spawn(selectedEnemy, finalPos, Quaternion.identity);
+
+        if (obj == null)
+        {
+            Debug.LogError("Spawn FAILED! Kiểm tra NetworkProjectConfig");
+        }
+        else
+        {
+            Debug.Log("Spawn SUCCESS: " + obj.name);
+
+            // 🔥 GÁN PATROL
+            SoiAiI enemy = obj.GetComponent<SoiAiI>();
+            if (enemy != null && patrolManager != null)
+            {
+                enemy.Init(patrolManager);
+            }
         }
     }
 }
