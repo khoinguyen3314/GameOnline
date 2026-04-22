@@ -1508,7 +1508,6 @@ GameObject:
   - component: {fileID: 1013820163964018016}
   - component: {fileID: 8342419999407869033}
   - component: {fileID: 9091195787878495747}
-  - component: {fileID: -5219077969443474056}
   m_Layer: 0
   m_Name: Enemy1
   m_TagString: Enemy
@@ -1682,23 +1681,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e786c7b8bcc78e478534d0b52f22c75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _CurrentHP: 0
-  MaxHP: 10
+  _CurrentHP: 30
+  MaxHP: 30
   die: {fileID: 573167629766793023}
---- !u!114 &-5219077969443474056
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5421417505295754792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1541381998, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Guid:
-    RawGuidValue: 7477627fe2ce76a45a5955671e46453b
 --- !u!1 &5714428190673603728
 GameObject:
   m_ObjectHideFlags: 0
