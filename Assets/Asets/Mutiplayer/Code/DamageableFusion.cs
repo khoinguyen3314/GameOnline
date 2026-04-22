@@ -8,9 +8,11 @@ public class DamageableFusion : NetworkBehaviour
     [SerializeField] public int MaxHP = 10;
     [SerializeField] NetworkBehaviour die;
     [Networked] private TickTimer DeathTimer { get; set; }
-
+    Animator ani;
     public override void Spawned()
     {
+        ani = GetComponentInParent<Animator>();
+        base.Spawned();
         if (Object.HasStateAuthority)
         {
             CurrentHP = MaxHP;
@@ -35,6 +37,7 @@ public class DamageableFusion : NetworkBehaviour
     private void StartDeathCountdown()
     {
         die.enabled = false;
+        ani.SetTrigger("Die");
         // Set timer 3 giây
         DeathTimer = TickTimer.CreateFromSeconds(Runner, 3f);
     }

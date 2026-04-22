@@ -16,6 +16,7 @@ public class Run1 : NetworkBehaviour
 
     public override void Spawned()
     {
+        base.Spawned();
         ani = GetComponent<Animator>();
         aiDiChuyen = GetComponent<NavMeshAgent>();
 
@@ -39,6 +40,7 @@ public class Run1 : NetworkBehaviour
             // Tìm điểm trên NavMesh gần nhất trong bán kính 2f và ép quái xuống đó
             if (NavMesh.SamplePosition(transform.position, out hitInfo, 2.0f, NavMesh.AllAreas))
             {
+                
                 aiDiChuyen.Warp(hitInfo.position);
             }
             return; // Dừng frame này để đợi Navmesh Agent kết nối xong
@@ -49,6 +51,7 @@ public class Run1 : NetworkBehaviour
         // Nếu không có ai gần đó thì đứng im và ĐẢM BẢO bật lại Script tấn công
         if (nguoiChoiMucTieu == null)
         {
+            ani.SetBool("Run", false);
             if (TanCong != null && !TanCong.enabled)
             {
                 TanCong.enabled = true;
@@ -63,6 +66,7 @@ public class Run1 : NetworkBehaviour
             // 🔥 Người chơi trong tầm -> TẮT TẤN CÔNG & BỎ CHẠY
             if (TanCong != null && TanCong.enabled)
             {
+                ani.SetBool("Run", true);
                 TanCong.enabled = false;
             }
 

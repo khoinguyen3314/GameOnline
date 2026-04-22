@@ -16,8 +16,9 @@ public class EnemyAttackFusion : NetworkBehaviour
     private double lanBanCuoi;
     private Transform mucTieu;
     Animator ani;
-    public void Start()
+    public override void Spawned()
     {
+        base.Spawned();
         ani = GetComponent<Animator>();
     }
     public override void FixedUpdateNetwork()
