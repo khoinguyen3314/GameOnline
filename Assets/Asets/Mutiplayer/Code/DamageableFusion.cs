@@ -6,6 +6,8 @@ public class DamageableFusion : NetworkBehaviour
     [Header("Health")]
     [Networked] public int CurrentHP { get; set; }
     [SerializeField] public int MaxHP = 10;
+    [SerializeField] NetworkBehaviour die;
+    [Networked] private TickTimer DeathTimer { get; set; }
 
     public override void Spawned()
     {
@@ -17,12 +19,31 @@ public class DamageableFusion : NetworkBehaviour
 
     public void InflictDamage(int damage, GameObject source)
     {
-        // Chỉ Host xử lý damage
         if (!Object.HasStateAuthority) return;
+
+        // Nếu đã chết rồi thì khỏi trừ nữa
+        if (DeathTimer.IsRunning) return;
 
         CurrentHP -= damage;
 
         if (CurrentHP <= 0)
+        {
+            StartDeathCountdown();
+        }
+    }
+
+    private void StartDeathCountdown()
+    {
+        die.enabled = false;
+        // Set timer 3 giây
+        DeathTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority) return;
+
+        if (DeathTimer.Expired(Runner))
         {
             Die();
         }
@@ -30,14 +51,13 @@ public class DamageableFusion : NetworkBehaviour
 
     private void Die()
     {
-        // Xóa object toàn mạng
         if (Runner != null)
         {
             Runner.Despawn(Object);
         }
         else
         {
-            Destroy(gameObject); // fallback nếu test offline
+            Destroy(gameObject);
         }
     }
 }

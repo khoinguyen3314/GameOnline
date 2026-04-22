@@ -11,7 +11,7 @@ public class Run1 : NetworkBehaviour
     [Header("Cài đặt AI bỏ chạy")]
     public float khoangCachBoChay = 5f;
     public float khoangCachDiChuyen = 10f;
-    [SerializeField] MonoBehaviour TanCong;
+    [SerializeField] NetworkBehaviour TanCong;
     private NavMeshAgent aiDiChuyen;
 
     public override void Spawned()

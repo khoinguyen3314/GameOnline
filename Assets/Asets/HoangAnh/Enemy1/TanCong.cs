@@ -15,7 +15,11 @@ public class EnemyAttackFusion : NetworkBehaviour
 
     private double lanBanCuoi;
     private Transform mucTieu;
-
+    Animator ani;
+    public void Start()
+    {
+        ani = GetComponent<Animator>();
+    }
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasStateAuthority) return;
@@ -51,8 +55,7 @@ public class EnemyAttackFusion : NetworkBehaviour
     {
         if (danPrefab == null || diemBan == null || mucTieu == null) return;
 
-        Vector3 huongBan = (mucTieu.position - diemBan.position).normalized;
-
+        Vector3 huongBan = (mucTieu.position - diemBan.position).normalized;        
         NetworkObject dan = Runner.Spawn(
             danPrefab,
             diemBan.position,
@@ -65,6 +68,7 @@ public class EnemyAttackFusion : NetworkBehaviour
             BulletFusion bullet = dan.GetComponent<BulletFusion>();
             if (bullet != null)
             {
+                ani.SetTrigger("Attack");
                 bullet.Init(huongBan);
             }
         }
