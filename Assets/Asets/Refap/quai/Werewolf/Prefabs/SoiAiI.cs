@@ -1,79 +1,108 @@
 ﻿using UnityEngine;
 using Fusion;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class SoiAiI : NetworkBehaviour
 {
-    [SerializeField] private float speed = 3f;
-    [SerializeField] private float reachDistance = 0.5f;
+    [Header("Cấu hình Vùng Tuần Tra")]
+    [Tooltip("Kích thước hình chữ nhật (Trục X và Z)")]
+    [SerializeField] private Vector2 kichThuocVung = new Vector2(10f, 10f);
+    [Tooltip("Thời gian đứng nghỉ rình rập trước khi đi tiếp")]
+    [SerializeField] private float thoiGianNghi = 2f;
+
+    [Header("Tốc Độ Tuần Tra")]
+    public float tocDoTuanTra = 2.5f;
 
     [Header("Animation")]
     [SerializeField] private NetworkMecanimAnimator netAnim;
 
-    private PatrolPointManager patrolManager;
-    private int currentIndex = 0;
+    private NavMeshAgent agent;
+    private Vector3 tamVungTuanTra;
 
-    public void Init(PatrolPointManager manager)
+    private TickTimer timerNghi;
+    private bool dangNghi = false;
+
+    public override void Spawned()
     {
-        patrolManager = manager;
+        agent = GetComponent<NavMeshAgent>();
+        tamVungTuanTra = transform.position;
 
-        if (manager != null && manager.PointCount > 0)
+        if (HasStateAuthority)
         {
-            currentIndex = Random.Range(0, manager.PointCount);
+            TimDiemTuanTraMoi();
         }
     }
+
+    // Mỗi khi script này được Bật lại (OnEnable) bởi AttackSoi, nó sẽ ép lại tốc độ đi bộ
+    //private void OnEnable()
+    //{
+    //    if (agent != null)
+    //    {
+    //        agent.speed = tocDoTuanTra;
+    //        dangNghi = false;
+    //        TimDiemTuanTraMoi();
+    //    }
+    //}
 
     public override void FixedUpdateNetwork()
     {
-        if (!HasStateAuthority) return;
-        if (patrolManager == null || patrolManager.PointCount == 0)
+        if (!HasStateAuthority || agent == null) return;
+
+        // Ép liên tục tốc độ tuần tra phòng hờ rớt nhịp mạng
+        agent.speed = tocDoTuanTra;
+
+        if (dangNghi)
         {
-            SetIdle();
-            return;
-        }
-
-        Transform target = patrolManager.GetPoint(currentIndex);
-        if (target == null)
-        {
-            SetIdle();
-            return;
-        }
-
-        Vector3 targetPos = target.position;
-        targetPos.y = transform.position.y;
-
-        Vector3 dir = (targetPos - transform.position).normalized;
-
-        // Di chuyển
-        transform.position += dir * speed * Runner.DeltaTime;
-
-        // Quay mặt
-        if (dir != Vector3.zero)
-        {
-            transform.forward = dir;
-        }
-
-        // 🎬 Animation RUN
-        if (dir != Vector3.zero)
-        {
-            SetRun();
+            if (timerNghi.Expired(Runner))
+            {
+                dangNghi = false;
+                TimDiemTuanTraMoi();
+            }
         }
         else
         {
-            SetIdle();
-        }
-
-        // Đến điểm
-        if (Vector3.Distance(transform.position, targetPos) < reachDistance)
-        {
-            currentIndex = (currentIndex + 1) % patrolManager.PointCount;
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    dangNghi = true;
+                    timerNghi = TickTimer.CreateFromSeconds(Runner, thoiGianNghi);
+                    SetIdle();
+                }
+            }
+            else
+            {
+                SetRun();
+            }
         }
     }
 
-    // ================= ANIMATION =================
+    void TimDiemTuanTraMoi()
+    {
+        if (agent == null || !agent.isOnNavMesh) return;
+
+        for (int i = 0; i < 5; i++)
+        {
+            float randomX = Random.Range(-kichThuocVung.x / 2f, kichThuocVung.x / 2f);
+            float randomZ = Random.Range(-kichThuocVung.y / 2f, kichThuocVung.y / 2f);
+
+            Vector3 diemRandom = tamVungTuanTra + new Vector3(randomX, 0, randomZ);
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(diemRandom, out hit, 2f, NavMesh.AllAreas))
+            {
+                agent.isStopped = false;
+                agent.SetDestination(hit.position);
+                SetRun();
+                return;
+            }
+        }
+    }
 
     void SetRun()
     {
-        if (netAnim != null)
+        if (netAnim != null && netAnim.Animator != null)
         {
             netAnim.Animator.SetBool("IsRun", true);
             netAnim.Animator.SetBool("IsAttack", false);
@@ -82,10 +111,17 @@ public class SoiAiI : NetworkBehaviour
 
     void SetIdle()
     {
-        if (netAnim != null)
+        if (netAnim != null && netAnim.Animator != null)
         {
             netAnim.Animator.SetBool("IsRun", false);
             netAnim.Animator.SetBool("IsAttack", false);
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Vector3 center = Application.isPlaying ? tamVungTuanTra : transform.position;
+        Gizmos.DrawWireCube(center, new Vector3(kichThuocVung.x, 0.5f, kichThuocVung.y));
     }
 }

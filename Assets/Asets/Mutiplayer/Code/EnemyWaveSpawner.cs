@@ -93,22 +93,6 @@ public class EnemyWaveSpawner : NetworkBehaviour
 
         Debug.Log("TRY SPAWN");
 
-        var obj = Runner.Spawn(selectedEnemy, finalPos, Quaternion.identity);
-
-        if (obj == null)
-        {
-            Debug.LogError("Spawn FAILED! Kiểm tra NetworkProjectConfig");
-        }
-        else
-        {
-            Debug.Log("Spawn SUCCESS: " + obj.name);
-
-            // 🔥 GÁN PATROL
-            SoiAiI enemy = obj.GetComponent<SoiAiI>();
-            if (enemy != null && patrolManager != null)
-            {
-                enemy.Init(patrolManager);
-            }
-        }
+        var obj = Runner.Spawn(selectedEnemy, finalPos, Quaternion.identity);        
     }
 }

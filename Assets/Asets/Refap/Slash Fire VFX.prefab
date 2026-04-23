@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 1818942974821468241}
   - component: {fileID: 6815117908262772443}
   - component: {fileID: 6887691109721032872}
-  - component: {fileID: 7118155570297085177}
   m_Layer: 0
   m_Name: Slash Fire VFX
   m_TagString: HitBox
@@ -4935,7 +4934,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 9164442189969673808}
   - {fileID: 6887691109721032872}
-  - {fileID: 7118155570297085177}
   ForceRemoteRenderTimeframe: 0
 --- !u!54 &1818942974821468241
 Rigidbody:
@@ -4998,18 +4996,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifeTime: 1
---- !u!114 &7118155570297085177
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5313456068782518071}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6baaa3d93d4736d40a63e8838208e287, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6090277084310656479
 GameObject:
   m_ObjectHideFlags: 0

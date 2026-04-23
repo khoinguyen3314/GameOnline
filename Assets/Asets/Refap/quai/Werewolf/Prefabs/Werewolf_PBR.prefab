@@ -1274,8 +1274,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a27d56b9d2c0e0d47b670bc8744456f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
-  reachDistance: 0.5
+  kichThuocVung: {x: 10, y: 10}
+  thoiGianNghi: 2
+  tocDoTuanTra: 2.5
   netAnim: {fileID: 1440896565664320117}
 --- !u!114 &2274497151821768272
 MonoBehaviour:
@@ -1309,9 +1310,9 @@ MonoBehaviour:
   Animator: {fileID: 4647756248677067048}
   ApplyTiming: 2
   SyncSettings: 79
-  StateHashes: 00000000
-  TriggerHashes: 0000000037b93501
-  TotalWords: 1
+  StateHashes: 00000000557a918d0720eea4
+  TriggerHashes: 00000000
+  TotalWords: 0
 --- !u!114 &-3594547679666601197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1324,6 +1325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9095d0b86d579564d9079d87a90bf15e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  diemXuatPhatTia: {fileID: 0}
   khoangCachPhatHien: 7.7
   gocPhatHien: 55.66
   gocCuiXuong: 11.8
@@ -1335,9 +1337,11 @@ MonoBehaviour:
   layerTuong:
     serializedVersion: 2
     m_Bits: 16
+  tocDoDuoiBat: 6
   mauBinhThuong: {r: 1, g: 0.28260195, b: 0.015686274, a: 1}
   mauPhatHien: {r: 1, g: 0.16143444, b: 0, a: 1}
   materialHinhNon: {fileID: 2100000, guid: 08e99bab8a809754a938d878461f237d, type: 2}
+  scriptTuanTra: {fileID: 0}
 --- !u!33 &2303919842753048463
 MeshFilter:
   m_ObjectHideFlags: 0
