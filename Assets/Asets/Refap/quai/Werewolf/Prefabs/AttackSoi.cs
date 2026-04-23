@@ -1,145 +1,170 @@
 ﻿using UnityEngine;
 using Fusion;
 
-[RequireComponent(typeof(LineRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class AttackSoi : NetworkBehaviour
 {
-    [Header("Cấu hình hình nón")]
-    [SerializeField] private float khoangCachPhatHien = 6f;
-    [SerializeField] private float gocPhatHien = 60f;
-    [SerializeField] private int soLuongTia = 20;
+    [Header("Cấu hình hình nón 3D")]
+    public float khoangCachPhatHien = 10f;
+    [Range(0, 360)] public float gocPhatHien = 70f;
+    [Range(-90, 90)] public float gocCuiXuong = 15f; // Chỉnh góc này để tia cắm xuống đất
+    public float chieuCaoMat = 1.5f; // Kéo tia lên ngang đầu con sói
+    public int soLuongTia = 40;
 
     [Header("Layer")]
-    [SerializeField] private LayerMask layerPlayer;
-    [SerializeField] private LayerMask layerTuong;
+    public LayerMask layerPlayer;
+    public LayerMask layerTuong;
 
-    [Header("Debug")]
-    [SerializeField] private bool veDebug = true;
-    [SerializeField] private float thoiGianDebug = 0.1f;
+    [Header("Hiển thị View Game")]
+    public Color mauBinhThuong = new Color(1f, 1f, 0f, 0.3f);
+    public Color mauPhatHien = new Color(1f, 0f, 0f, 0.4f);
 
-    [Header("Hiển thị")]
-    [SerializeField] private Color mauBinhThuong = Color.yellow;
-    [SerializeField] private Color mauPhatHien = Color.red;
+    public Material materialHinhNon;
 
-    private LineRenderer duongVe;
+    private Mesh meshHinhNon;
+    private MeshRenderer meshRenderer;
+
+    [Networked] private NetworkBool DaThayPlayer { get; set; }
 
     public override void Spawned()
     {
-        duongVe = GetComponent<LineRenderer>();
-        duongVe.positionCount = soLuongTia + 1;
-        duongVe.useWorldSpace = true;
-        duongVe.widthMultiplier = 0.05f;
+        meshHinhNon = new Mesh();
+        meshHinhNon.name = "ViewConeMesh3D";
+        GetComponent<MeshFilter>().mesh = meshHinhNon;
+
+        meshRenderer = GetComponent<MeshRenderer>();
+        if (materialHinhNon != null)
+        {
+            meshRenderer.material = materialHinhNon;
+        }
     }
 
     public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority) return;
-
-        bool thayPlayer = KiemTraVaPhatHien();
-        VeHinhNon(thayPlayer);
+        DaThayPlayer = KiemTraPhatHien();
     }
 
-    // ================= PHÁT HIỆN =================
-    bool KiemTraVaPhatHien()
+    public override void Render()
     {
-        float nuaGoc = gocPhatHien * 0.5f;
-        LayerMask layerGop = layerPlayer | layerTuong;
+        VeMeshHinhNon();
 
-        bool daThayPlayer = false;
-
-        for (int i = 0; i < soLuongTia; i++)
+        if (meshRenderer != null && meshRenderer.material != null)
         {
-            float tiLe = (float)i / (soLuongTia - 1);
-            float gocHienTai = Mathf.Lerp(-nuaGoc, nuaGoc, tiLe);
+            Color mauHienTai = DaThayPlayer ? mauPhatHien : mauBinhThuong;
 
-            Vector3 huong = Quaternion.Euler(0, gocHienTai, 0) * transform.forward;
+            // Dành cho chuẩn Unity cũ (phòng hờ)
+            meshRenderer.material.color = mauHienTai;
 
-            Ray tia = new Ray(transform.position, huong);
-            RaycastHit trung;
-
-            if (Physics.Raycast(tia, out trung, khoangCachPhatHien, layerGop))
+            // Dành cho chuẩn URP (Universal Render Pipeline)
+            if (meshRenderer.material.HasProperty("_BaseColor"))
             {
-                // 🧱 Trúng tường → bị chặn
-                if (((1 << trung.collider.gameObject.layer) & layerTuong) != 0)
-                {
-                    if (veDebug)
-                        Debug.DrawLine(tia.origin, trung.point, Color.red, thoiGianDebug);
-                }
-                // 🎯 Trúng player
-                else if (((1 << trung.collider.gameObject.layer) & layerPlayer) != 0)
-                {
-                    daThayPlayer = true;
-
-                    if (veDebug)
-                        Debug.DrawLine(tia.origin, trung.point, Color.green, thoiGianDebug);
-
-                    Debug.Log("👁️ Thấy Player: " + trung.collider.name);
-                }
-            }
-            else
-            {
-                if (veDebug)
-                    Debug.DrawRay(tia.origin, huong * khoangCachPhatHien, Color.yellow, thoiGianDebug);
-            }
-        }
-
-        return daThayPlayer;
-    }
-
-    // ================= VẼ HÌNH NÓN =================
-    void VeHinhNon(bool thayPlayer)
-    {
-        float nuaGoc = gocPhatHien * 0.5f;
-        LayerMask layerGop = layerPlayer | layerTuong;
-
-        duongVe.positionCount = soLuongTia + 1;
-        duongVe.SetPosition(0, transform.position);
-
-        Color mauHienTai = thayPlayer ? mauPhatHien : mauBinhThuong;
-        duongVe.startColor = mauHienTai;
-        duongVe.endColor = mauHienTai;
-
-        for (int i = 0; i < soLuongTia; i++)
-        {
-            float tiLe = (float)i / (soLuongTia - 1);
-            float gocHienTai = Mathf.Lerp(-nuaGoc, nuaGoc, tiLe);
-
-            Vector3 huong = Quaternion.Euler(0, gocHienTai, 0) * transform.forward;
-
-            Ray tia = new Ray(transform.position, huong);
-            RaycastHit trung;
-
-            Vector3 diemCuoi;
-
-            if (Physics.Raycast(tia, out trung, khoangCachPhatHien, layerGop))
-            {
-                diemCuoi = trung.point; // bị tường cắt
-            }
-            else
-            {
-                diemCuoi = transform.position + huong * khoangCachPhatHien;
+                meshRenderer.material.SetColor("_BaseColor", mauHienTai);
             }
 
-            duongVe.SetPosition(i + 1, diemCuoi);
+            // Nếu bật Emission (phát sáng), đổi màu cả cái viền sáng
+            if (meshRenderer.material.HasProperty("_EmissionColor"))
+            {
+                // Nhân 2f để ánh sáng rực lên một chút cho đẹp
+                meshRenderer.material.SetColor("_EmissionColor", mauHienTai * 2f);
+            }
         }
     }
 
-    // ================= GIZMOS =================
+    // --- HÀM TÍNH TOÁN VỊ TRÍ MẮT VÀ HƯỚNG TIA 3D ---
+    Vector3 LayViTriMat()
+    {
+        // Nâng điểm bắt đầu lên theo chiều cao mắt
+        return transform.position + transform.up * chieuCaoMat;
+    }
+
+    Vector3 LayHuongTia(float gocY)
+    {
+        // gocCuiXuong (Trục X), gocY (Trục Y)
+        Quaternion localRot = Quaternion.Euler(gocCuiXuong, gocY, 0);
+        return transform.rotation * localRot * Vector3.forward;
+    }
+
+    bool KiemTraPhatHien()
+    {
+        Vector3 viTriMat = LayViTriMat();
+        float nuaGoc = gocPhatHien / 2f;
+        float step = gocPhatHien / soLuongTia;
+        LayerMask layerGop = layerPlayer | layerTuong;
+
+        for (int i = 0; i <= soLuongTia; i++)
+        {
+            float gocY = -nuaGoc + step * i;
+            Vector3 huong = LayHuongTia(gocY);
+
+            if (Physics.Raycast(viTriMat, huong, out RaycastHit trung, khoangCachPhatHien, layerGop))
+            {
+                if (((1 << trung.collider.gameObject.layer) & layerPlayer) != 0) return true;
+            }
+        }
+        return false;
+    }
+
+    void VeMeshHinhNon()
+    {
+        int vertexCount = soLuongTia + 2;
+        Vector3[] vertices = new Vector3[vertexCount];
+        int[] triangles = new int[(vertexCount - 2) * 6];
+
+        Vector3 viTriMatWorld = LayViTriMat();
+
+        // Chuyển vị trí mắt từ World Space về Local Space để làm đỉnh nhọn của Mesh
+        vertices[0] = transform.InverseTransformPoint(viTriMatWorld);
+
+        float nuaGoc = gocPhatHien / 2f;
+        float step = gocPhatHien / soLuongTia;
+
+        for (int i = 0; i <= soLuongTia; i++)
+        {
+            float gocY = -nuaGoc + step * i;
+            Vector3 huong = LayHuongTia(gocY);
+
+            Vector3 diemCuoi = viTriMatWorld + huong * khoangCachPhatHien;
+
+            if (Physics.Raycast(viTriMatWorld, huong, out RaycastHit trung, khoangCachPhatHien, layerTuong))
+            {
+                diemCuoi = trung.point;
+            }
+
+            vertices[i + 1] = transform.InverseTransformPoint(diemCuoi);
+
+            if (i < soLuongTia)
+            {
+                int triIndex = i * 6;
+                triangles[triIndex] = 0;
+                triangles[triIndex + 1] = i + 1;
+                triangles[triIndex + 2] = i + 2;
+                triangles[triIndex + 3] = 0;
+                triangles[triIndex + 4] = i + 2;
+                triangles[triIndex + 5] = i + 1;
+            }
+        }
+
+        meshHinhNon.Clear();
+        meshHinhNon.vertices = vertices;
+        meshHinhNon.triangles = triangles;
+        meshHinhNon.RecalculateNormals();
+        meshHinhNon.RecalculateBounds(); // Cập nhật ranh giới 3D
+    }
+
     void OnDrawGizmos()
     {
-        if (!veDebug) return;
+        Vector3 viTriMat = LayViTriMat();
+        float nuaGoc = gocPhatHien / 2f;
+        float step = gocPhatHien / soLuongTia;
 
-        float nuaGoc = gocPhatHien * 0.5f;
+        Gizmos.color = Color.yellow;
 
-        for (int i = 0; i < soLuongTia; i++)
+        for (int i = 0; i <= soLuongTia; i++)
         {
-            float tiLe = (float)i / (soLuongTia - 1);
-            float gocHienTai = Mathf.Lerp(-nuaGoc, nuaGoc, tiLe);
-
-            Vector3 huong = Quaternion.Euler(0, gocHienTai, 0) * transform.forward;
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawRay(transform.position, huong * khoangCachPhatHien);
+            float gocY = -nuaGoc + step * i;
+            Vector3 huong = LayHuongTia(gocY);
+            Gizmos.DrawRay(viTriMat, huong * khoangCachPhatHien);
         }
     }
 }
