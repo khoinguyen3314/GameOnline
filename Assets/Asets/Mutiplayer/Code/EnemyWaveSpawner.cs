@@ -11,8 +11,6 @@ public class EnemyWaveSpawner : NetworkBehaviour
     [Header("Spawn Point")]
     [SerializeField] private Transform spawnPoint;
 
-    [Header("Patrol Manager")]
-    [SerializeField] private PatrolPointManager patrolManager;
 
     [Header("Wave Settings")]
     [SerializeField] private float spawnDelay = 1f;
